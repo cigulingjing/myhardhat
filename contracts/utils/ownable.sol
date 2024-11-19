@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)
-
 pragma solidity ^0.8.0;
 
 abstract contract Context {
@@ -29,8 +27,6 @@ abstract contract Context {
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-
-
 abstract contract Ownable is Context {
     address private _owner;
 
@@ -38,7 +34,6 @@ abstract contract Ownable is Context {
      * @dev The caller account is not authorized to perform an operation.
      */
     error OwnableUnauthorizedAccount(address account);
-
     /**
      * @dev The owner is not a valid owner account. (eg. `address(0)`)
      */
@@ -55,7 +50,6 @@ abstract contract Ownable is Context {
         }
         _transferOwnership(initialOwner);
     }
-
     /**
      * @dev Throws if called by any account other than the owner.
      */

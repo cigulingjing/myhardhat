@@ -2,17 +2,8 @@
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
 
-Try running some of the following tasks:
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
-
-## reference
+## Reference
 
 [代码案例](https://github.com/LazyDreamingDog/oracleDemo/tree/main/contracts)
 
@@ -43,3 +34,9 @@ npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.js --network localhost 
 ```
 
+## Dependency
+
+| Tool    | Version |
+| - | - |
+| nodejs  | v18.20.5  |
+| npm  | 10.8.2   |
