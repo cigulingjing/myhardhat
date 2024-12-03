@@ -11,12 +11,11 @@ describe("MutiVoucher Contract", function () {
   let addr2;
 
   beforeEach(async function () {
-    // 获取部署合约所需的帐户
+    // Deploy mutivoucher
     [owner, addr1, addr2] = await ethers.getSigners();
 
-    // 部署 MutiVoucher 合约
     MutiVoucher = await ethers.getContractFactory("MutiVoucher");
-    mutiVoucher = await MutiVoucher.deploy(owner.address);
+    mutiVoucher = await MutiVoucher.deploy();
     await mutiVoucher.deployed();
   });
 

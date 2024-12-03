@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import "./utils/ownable.sol";
 
-contract MutiVoucher is Ownable {
+contract MutiVoucher {
     struct Voucher {
         uint256 conversionRate;           // exchange rate with ETH
         mapping(address => uint256) balances; 
@@ -15,11 +15,11 @@ contract MutiVoucher is Ownable {
     event VoucherPurchased(address buyer, string voucherName, uint256 amount);
     event VoucherUsed(address user, string voucherName, uint256 amount);
     
-    // Initial 
-    constructor(address initialOwner) Ownable(initialOwner) {}
+    // Initial the contract owner
+    // constructor() Ownable(msg.sender) {}
 
     // Create new voucher and store in vouchers
-    function createVoucher(string memory name, uint256 conversionRate) external onlyOwner {
+    function createVoucher(string memory name, uint256 conversionRate) external {
         require(conversionRate > 0, "Conversion rate must be greater than zero");
         require(bytes(name).length > 0, "Voucher name cannot be empty");
         
