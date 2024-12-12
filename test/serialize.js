@@ -5,8 +5,8 @@ const { ethers } = require("hardhat");
 describe("Serialize contract test",function(){
 
     let owner,sign1,sign2;
-    let value=100;
-    let code="hello.go";
+    let value1=100;
+    let value2=100;
 
     beforeEach(async function () {
         [owner,sign1,sign2] = await ethers.getSigners();
@@ -15,15 +15,20 @@ describe("Serialize contract test",function(){
         await serialize.deployed();
     });
 
-    it("Serialize arguments",async function(){
+    it("Serialize arguments, Using abi.encode",async function(){
         const addr=await sign1.getAddress();
-        packedData = await serialize.pack(value,addr,code);
+        packedData = await serialize.encode(value1,value2);
+        console.log(packedData);
+    });
+
+    it("Serialize arguments, Using abi.encodePacked",async function(){
+        const addr=await sign1.getAddress();
+        packedData = await serialize.encodePacked(value1,addr,code);
         console.log(packedData);
 
-        let [value1, addr1, code1] = await serialize.unpack(packedData);
-        expect(value1).to.equal(value);
-        expect(addr1).to.equal(addr);
-        expect(code1).to.equal(code);
-
+        // let [value1, addr1, code1] = await serialize.unpack(packedData);
+        // expect(value1).to.equal(value);
+        // expect(addr1).to.equal(addr);
+        // expect(code1).to.equal(code);
     });
 });

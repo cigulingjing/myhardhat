@@ -4,9 +4,15 @@ pragma solidity ^0.8.15;
 
 contract Serialize{
 
-    function pack(uint a, address b, string memory c) external pure returns (bytes memory) {
+    function encode(int a, int b) external pure returns (bytes memory) {
         // Abi 
-        bytes memory input=abi.encode(a,b,c);
+        bytes memory input=abi.encode(a,b);
+        return input;
+    }
+
+    function encodePacked(uint a, address b, string memory c) external pure returns (bytes memory) {
+        // Abi 
+        bytes memory input=abi.encodePacked(a,b,c);
         return input;
     }
 
@@ -14,5 +20,9 @@ contract Serialize{
         (uint a,address b,string memory c)=abi.decode(input,(uint,address,string));
         return (a,b,c);
     } 
+
+    function add(uint a,uint b) public pure returns (uint){
+        return a+b;
+    }
 
 }
