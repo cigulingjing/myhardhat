@@ -23,6 +23,8 @@ contract CodeStorage{
         require(gas>0,"gas is less than 0");
         Codes[name]=Code(code,gas,itype,otype);
         emit CodeUploaded(name, code, gas, block.timestamp);
+        // Automatic update
+        emit pullcode(name);
     }
 
     function updataGas(string memory name,uint64 _gas) external {

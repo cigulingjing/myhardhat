@@ -14,9 +14,6 @@ contract MutiVoucher {
     event VoucherCreated(string voucherName, uint256 conversionRate);
     event VoucherPurchased(address buyer, string voucherName, uint256 amount);
     event VoucherUsed(address user, string voucherName, uint256 amount);
-    
-    // Initial the contract owner
-    // constructor() Ownable(msg.sender) {}
 
     // Create new voucher and store in vouchers
     function createVoucher(string memory name, uint256 conversionRate) external {
@@ -33,14 +30,13 @@ contract MutiVoucher {
         return vouchers[name].conversionRate;
     }
 
-    function buy(string memory name, uint256 amount) external payable {
+     function buy(string memory name) external payable {
         require(vouchers[name].conversionRate > 0, "Voucher doesn't exist");
-        require(amount > 0, "Amount must be greater than zero");
-        require(msg.value == amount * vouchers[name].conversionRate, "Incorrect amount sent");
-        
-        // Add balances
-        vouchers[name].balances[msg.sender] += amount;
-        emit VoucherPurchased(msg.sender, name, amount);
+        require(msg.value > 0, "Message value must be greater than zero");
+        // Attention the unit of value is wei
+        uint256 expectedAmount=msg.value*vouchers[name].conversionRate;
+        vouchers[name].balances[msg.sender] += expectedAmount;
+        emit VoucherPurchased(msg.sender, name, expectedAmount);
     }
 
     function use(string memory name, uint256 amount) external {

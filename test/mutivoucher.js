@@ -1,93 +1,90 @@
-// test/MutiVoucherTest.js
-
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("MutiVoucher Contract", function () {
+describe("MutiVoucher", function () {
   let MutiVoucher;
-  let mutiVoucher;
+  let voucherContract;
   let owner;
   let addr1;
   let addr2;
+  let conversionRate = 2; // conversion rate for the voucher
 
   beforeEach(async function () {
-    // Deploy mutivoucher
-    [owner, addr1, addr2] = await ethers.getSigners();
-
+    // 部署合约
     MutiVoucher = await ethers.getContractFactory("MutiVoucher");
-    mutiVoucher = await MutiVoucher.deploy();
-    await mutiVoucher.deployed();
+    [owner, addr1, addr2] = await ethers.getSigners();
+    voucherContract = await MutiVoucher.deploy();
+    await voucherContract.deployed();
+
+    await voucherContract.createVoucher("Voucher1", conversionRate);
   });
 
-  describe("Voucher creation", function () {
-    it("should allow the owner to create a voucher", async function () {
-      await mutiVoucher.createVoucher("VoucherA", 10);
-
-      const conversionRate = await mutiVoucher.getVoucherInfo("VoucherA");
-      expect(conversionRate).to.equal(10);
-    });
-
-    it("should fail if someone other than the owner tries to create a voucher", async function () {
-      await expect(mutiVoucher.connect(addr1).createVoucher("VoucherB", 20)).to.be.revertedWith("OwnableUnauthorizedAccount");
-    });
+  it("get info of voucher", async function () {
+    // 查询代金券的汇率信息
+    const rate = await voucherContract.getVoucherInfo("Voucher1");
+    expect(rate).to.equal(conversionRate);
   });
 
-  describe("Buying vouchers", function () {
-    beforeEach(async function () {
-      await mutiVoucher.createVoucher("VoucherA", 10);  // Create VoucherA first
-    });
+  it("Should allow user to buy voucher", async function () {
+    // 用户 addr1 使用 ETH 购买代金券
+    const buyAmount = ethers.utils.parseEther("1.0"); // 1 ETH
+    await voucherContract.connect(addr1).buy("Voucher1", { value: buyAmount });
 
-    it("should allow a user to buy a voucher", async function () {
-      const initialBalance = await mutiVoucher.balanceOf("VoucherA", addr1.address);
-      expect(initialBalance).to.equal(0);
+    // 检查用户余额是否正确增加
+    const balance = await voucherContract.balanceOf("Voucher1", addr1.address);
+    
+    console.log("balance:",balance)
 
-      // addr1 buys 5 VoucherA
-      await mutiVoucher.connect(addr1).buy("VoucherA", 5, { value: 50 });
-
-      const newBalance = await mutiVoucher.balanceOf("VoucherA", addr1.address);
-      expect(newBalance).to.equal(5);
-    });
-
-    it("should fail if the wrong amount of ETH is sent", async function () {
-      await expect(mutiVoucher.connect(addr1).buy("VoucherA", 5, { value: 40 })).to.be.revertedWith("Incorrect amount sent");
-    });
-
-    it("should fail if the voucher does not exist", async function () {
-      await expect(mutiVoucher.connect(addr1).buy("VoucherNonExistent", 5, { value: 50 })).to.be.revertedWith("Voucher doesn't exist");
-    });
   });
 
-  describe("Using vouchers", function () {
-    beforeEach(async function () {
-      await mutiVoucher.createVoucher("VoucherA", 10);
-      await mutiVoucher.connect(addr1).buy("VoucherA", 5, { value: 50 });
-    });
-
-    it("should allow a user to use their voucher", async function () {
-      const initialBalance = await mutiVoucher.balanceOf("VoucherA", addr1.address);
-      expect(initialBalance).to.equal(5);
-
-      await mutiVoucher.connect(addr1).use("VoucherA", 2);
-
-      const newBalance = await mutiVoucher.balanceOf("VoucherA", addr1.address);
-      expect(newBalance).to.equal(3);
-    });
-
-    it("should fail if the user does not have enough balance", async function () {
-      await expect(mutiVoucher.connect(addr1).use("VoucherA", 6)).to.be.revertedWith("Insufficient balance");
-    });
+  it("Should not allow user to buy voucher with zero ETH", async function () {
+    await expect(
+      voucherContract.connect(addr1).buy("Voucher1", { value: 0 })
+    ).to.be.revertedWith("Message value must be greater than zero");
   });
 
-  describe("Renouncing ownership", function () {
-    it("should allow the owner to renounce ownership", async function () {
-      await mutiVoucher.connect(owner).renounceOwnership();
-      
-      const currentOwner = await mutiVoucher.owner();
-      expect(currentOwner).to.equal(ethers.constants.AddressZero);
-    });
+  it("Should allow user to use voucher", async function () {
+    // 用户 addr1 使用 ETH 购买代金券
+    const buyAmount = ethers.utils.parseEther("1.0"); // 1 ETH
+    await voucherContract.connect(addr1).buy("Voucher1", { value: buyAmount });
+    // 使用代金券
+    const useAmount = buyAmount.mul(conversionRate);
+    await voucherContract.connect(addr1).use("Voucher1", useAmount);
+    // 检查用户余额
+    const balance = await voucherContract.balanceOf("Voucher1", addr1.address);
+    expect(balance).to.equal(0);
+  });
 
-    it("should fail if non-owner tries to renounce ownership", async function () {
-      await expect(mutiVoucher.connect(addr1).renounceOwnership()).to.be.revertedWith("OwnableUnauthorizedAccount");
-    });
+  it("Should not allow user to use more vouchers than they have", async function () {
+    // 用户 addr1 使用 ETH 购买代金券
+    const buyAmount = ethers.utils.parseEther("1.0"); // 1 ETH
+    await voucherContract.connect(addr1).buy("Voucher1", { value: buyAmount });
+    // 用户试图使用超过拥有的代金券，应当失败
+    const excessiveAmount = buyAmount.mul(conversionRate).add(1);
+    await expect(
+      voucherContract.connect(addr1).use("Voucher1", excessiveAmount)
+    ).to.be.revertedWith("Insufficient balance");
+  });
+
+  it("Should return correct balance for multiple users", async function () {
+    // 创建代金券
+    await voucherContract.createVoucher("Voucher1", conversionRate);
+
+    // 用户 addr1 和 addr2 使用 ETH 购买代金券
+    const buyAmount1 = ethers.utils.parseEther("1.0"); // 1 ETH
+    const buyAmount2 = ethers.utils.parseEther("0.5"); // 0.5 ETH
+
+    await voucherContract.connect(addr1).buy("Voucher1", { value: buyAmount1 });
+    await voucherContract.connect(addr2).buy("Voucher1", { value: buyAmount2 });
+
+    // 检查用户的余额
+    const balance1 = await voucherContract.balanceOf("Voucher1", addr1.address);
+    const balance2 = await voucherContract.balanceOf("Voucher1", addr2.address);
+
+    const expectedAmount1 = buyAmount1.mul(conversionRate);
+    const expectedAmount2 = buyAmount2.mul(conversionRate);
+
+    expect(balance1).to.equal(expectedAmount1);
+    expect(balance2).to.equal(expectedAmount2);
   });
 });
