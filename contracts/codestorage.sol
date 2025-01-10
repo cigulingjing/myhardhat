@@ -14,27 +14,20 @@ contract CodeStorage{
     // Algorithm probable corrspond mutiple implementations 
     mapping(string => Code) private Codes;
 
-    event CodeUploaded(string name,string code,uint64 gas,uint256 timestamp);
     // Index will make params store in topics as Hash, which will make parse impossible 
-    event pullcode(string name);
+    event codeUploaded(string name);
 
     function uploadCode(string memory name,string memory code,uint64 gas, string memory itype,string memory otype) external  {
         require(bytes(code).length > 0, "Code cannot be empty"); 
         require(gas>0,"gas is less than 0");
         Codes[name]=Code(code,gas,itype,otype);
-        emit CodeUploaded(name, code, gas, block.timestamp);
-        // Automatic update
-        emit pullcode(name);
+        emit codeUploaded(name);
     }
 
     function updataGas(string memory name,uint64 _gas) external {
         require(bytes(Codes[name].code).length>0,"Code is empty");
         require(_gas>0,"gas is less than 0");
         Codes[name].gas=_gas;
-    }
-    // Everyone can pull code, emit @pullcode event to inform client update 
-    function pullCode(string memory name) external {
-        emit pullcode(name);
     }
 
     // This function implement is empty, only provide an gateway to call algorithm.
