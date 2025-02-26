@@ -1,22 +1,23 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.0;
 
 contract Coinbase {
     // 白名单mapping
     mapping(address => bool) public whitelist;
     
     // 硬编码的mapping地址
-    address public constant STAKING_ADDRESS = 0xaaA5025120001000000000000000000000000002;
-    
+    address public constant STAKING_ADDRESS = 0x63BC05BC6FCAb99AF9A4c215B2e92a9C6f45D41F;
     // 构造函数中初始化硬编码地址到白名单
     constructor() {
         whitelist[STAKING_ADDRESS] = true;
+        whitelist[0x57F96028bA3258ebFb4940d67443967cF23e3fc4]=true;
     }
     
     // 事件定义
     event CoinbaseAdded(
         string indexed source,  // 来源区 string类型 
-        string  rewardType,      // 奖励类型(如：挖矿、质押、投票等)
+        string rewardType,      // 奖励类型(如：挖矿、质押、投票等)
+        uint256 indexed timestamp,
         address[] selectedAddresses, // 奖励地址
         uint256[] rewards       // 奖励金额
     );
@@ -111,6 +112,7 @@ contract Coinbase {
         emit CoinbaseAdded(
             source,  // 使用传入的 source
             rewardType,
+            block.timestamp,
             selectedAddresses,
             rewards
         );
@@ -129,6 +131,7 @@ contract Coinbase {
         emit CoinbaseAdded(
             source,  // 使用传入的 source
             rewardType,
+            block.timestamp,
             rewardAddresses,
             rewardAmounts
         );
