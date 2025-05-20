@@ -31,4 +31,14 @@ describe("Serialize contract test",function(){
         // expect(addr1).to.equal(addr);
         // expect(code1).to.equal(code);
     });
+
+    it("Serialize bytes, including encode and decode",async function(){
+        const addr=await sign1.getAddress();
+
+        const a= ethers.utils.toUtf8Bytes("123");
+        const b= ethers.utils.toUtf8Bytes("456");
+        let result = await serialize.TestBytes(a,b);
+        console.log("dea",result[0]);
+        console.log("deb",result[1]);
+    })
 });

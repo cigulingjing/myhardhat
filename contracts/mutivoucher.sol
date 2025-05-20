@@ -8,7 +8,7 @@ contract MutiVoucher {
         uint256 conversionRate;           // exchange rate with ETH
         mapping(address => uint256) balances; 
     }
-    
+    string[] private voucherNames;
     mapping(string => Voucher) private vouchers;
 
     event VoucherCreated(string voucherName, uint256 conversionRate);
@@ -19,9 +19,14 @@ contract MutiVoucher {
     function createVoucher(string memory name, uint256 conversionRate) external {
         require(conversionRate > 0, "Conversion rate must be greater than zero");
         require(bytes(name).length > 0, "Voucher name cannot be empty");
-        
+        require(bytes(name).length<=10,"Voucher name length up to 10 ");
+        require(vouchers[name].conversionRate>0,"Voucher already exist");
+
+        // Create new voucher
         Voucher storage newVoucher = vouchers[name];
         newVoucher.conversionRate = conversionRate;
+        voucherNames.push(name);
+
         emit VoucherCreated(name, conversionRate);
     }
 
@@ -53,5 +58,9 @@ contract MutiVoucher {
     function balanceOf(string memory name, address user) external view returns (uint256) {
         require(vouchers[name].conversionRate > 0, "Voucher doesn't exist");
         return vouchers[name].balances[user];
+    }
+
+    function getAllVouchers() external view returns (string[] memory) {
+        return voucherNames;
     }
 }

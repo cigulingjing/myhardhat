@@ -16,6 +16,14 @@ contract Serialize{
         return input;
     }
 
+    function TestBytes(bytes memory a, bytes memory b) external pure returns (bytes memory,bytes memory) {
+        // Abi 
+        bytes memory input=abi.encode(a,b);
+        (bytes memory dea, bytes memory deb)=abi.decode(input,(bytes,bytes));
+        return (dea,deb);
+    }
+
+
     function unpack(bytes memory input) external pure returns(uint, address, string memory){
         (uint a,address b,string memory c)=abi.decode(input,(uint,address,string));
         return (a,b,c);

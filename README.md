@@ -11,6 +11,9 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 
 [官方文档](https://hardhat.org/hardhat-runner/docs/getting-started)
 
+## Learn 
+Hardhat 测试时候会自己搭建一个原生实现的以太坊节点，并给予此节点实现测试以及部署操作
+
 ## Demo
 
 Compile contracts:对于contract目录下的文件进行
