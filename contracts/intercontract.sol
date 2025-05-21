@@ -6,7 +6,6 @@ contract interCall{
     
     address codeStoraddress=0x0000000000000000000000000000000000000043;
     string codeSorSign="callFunc(string,bytes)";
-    
     uint public balance;
     // payable constructor can reciver ether
     constructor() payable {

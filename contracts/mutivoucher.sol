@@ -20,7 +20,7 @@ contract MutiVoucher {
         require(conversionRate > 0, "Conversion rate must be greater than zero");
         require(bytes(name).length > 0, "Voucher name cannot be empty");
         require(bytes(name).length<=10,"Voucher name length up to 10 ");
-        require(vouchers[name].conversionRate>0,"Voucher already exist");
+        require(vouchers[name].conversionRate==0,"Voucher already exist");
 
         // Create new voucher
         Voucher storage newVoucher = vouchers[name];
